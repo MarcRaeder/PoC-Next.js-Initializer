@@ -170,7 +170,7 @@ async function run(): Promise<void> {
         if (validation.valid) {
           return true
         }
-        return 'Invalid project name: ' + validation.problems![0]
+        return 'Invalid project named: ' + validation.problems![0]
       },
     })
 
