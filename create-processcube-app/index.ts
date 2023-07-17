@@ -225,7 +225,7 @@ async function run(): Promise<void> {
     process.exit(1)
   }
 
-  const example = typeof program.example === 'string' && program.example.trim()
+  let example = typeof program.example === 'string' && program.example.trim()
   const preferences = (conf.get('preferences') || {}) as Record<
     string,
     boolean | string
@@ -281,6 +281,31 @@ async function run(): Promise<void> {
         program.javascript = !Boolean(typescript)
         preferences.typescript = Boolean(typescript)
       }
+    }
+
+    const { template } = await prompts(
+      {
+        type: 'toggle',
+        name: 'template',
+        message: `Would you like to use processcube template?`,
+        initial: getPrefOrDefault('template'),
+        active: 'Yes',
+        inactive: 'No',
+      },
+      {
+        /**
+         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
+         * process and not write to the file system.
+         */
+        onCancel: () => {
+          console.error('Exiting.')
+          process.exit(1)
+        },
+      }
+    )
+    
+    if (template) {
+      example = 'https://github.com/MarcRaeder/PoC-Next.js-Template/tree/develop/my-app2'
     }
 
     if (
