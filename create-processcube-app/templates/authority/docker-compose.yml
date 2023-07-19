@@ -1,0 +1,23 @@
+version: "3.5"
+services:
+  engine:
+    image: 5minds/engine:14.2.6-extensions-0.21.0-alpha.8
+    ports:
+      - 8000:8000
+    volumes:
+      - ./.processcube/engine/config/:/etc/atlas-engine
+      - ./.processcube/engine/storage/:/root/.config/AtlasEngineFullstackServer/databases
+      - ./processes:/processes:ro
+    environment:
+      - CONFIG_PATH=/etc/atlas-engine/sqlite.json
+    command: --seed-dir=/processes
+
+  authority:
+    image: 5minds/authority:2.5.0-alpha.24
+    ports:
+      - 11560:11560
+    volumes:
+      - ./.processcube/authority/config.json:/etc/authority/config/config.json:ro
+      - ./.processcube/authority/users.json:/etc/authority/config/users.json
+    environment:
+      AdminCli__AdministratorRole: Administrators

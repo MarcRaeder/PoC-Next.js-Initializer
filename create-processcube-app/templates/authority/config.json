@@ -1,0 +1,39 @@
+{
+  "issuerUrl": "http://authority:11560",
+  "applicationPort": 11560,
+  "development": true,
+  "studio": true,
+  "engines": [
+    {
+      "clientId": "5minds_engine",
+      "clientSecret": "5minds_engine"
+    }
+  ],
+  "otherClients": [
+    {
+      "clientId": "newportal",
+      "clientSecret": "newportal",
+      "scope": "openid profile email",
+      "grant_types": ["authorization_code"],
+      "response_types": ["code"],
+      "redirect_uris": ["http://localhost:3000/api/auth/callback/authority"]
+    }
+  ],
+  "database": {
+    "dialect": "sqlite",
+    "storage": "storage/database.sqlite",
+    "logging": false
+  },
+  "extensions": {
+    "path": "../extensions",
+    "configs": {
+      "username_password": {
+        "usersPath": "/etc/authority/config/users.json",
+        "customization": {
+          "title": "5Minds Authority",
+          "logoPath": "/etc/authority/config/assets/5minds_logo.png"
+        }
+      }
+    }
+  }
+}

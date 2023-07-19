@@ -246,6 +246,59 @@ async function run(): Promise<void> {
     const getPrefOrDefault = (field: string) =>
       preferences[field] ?? defaults[field]
 
+    const { template } = await prompts(
+      {
+        type: 'toggle',
+        name: 'template',
+        message: `Would you like to use processcube template?`,
+        initial: getPrefOrDefault('template'),
+        active: 'Yes',
+        inactive: 'No',
+      },
+      {
+        /**
+         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
+         * process and not write to the file system.
+         */
+        onCancel: () => {
+          console.error('Exiting.')
+          process.exit(1)
+        },
+      }
+    )
+    
+    if (template) {
+      example = 'https://github.com/MarcRaeder/PoC-Next.js-Template/tree/develop/my-app2'
+    }
+
+    const { authority } = await prompts(
+      {
+        type: 'toggle',
+        name: 'authority',
+        message: `Would you like to use processcube authority?`,
+        initial: getPrefOrDefault('authority'),
+        active: 'Yes',
+        inactive: 'No',
+      },
+      {
+        /**
+         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
+         * process and not write to the file system.
+         */
+        onCancel: () => {
+          console.error('Exiting.')
+          process.exit(1)
+        },
+      }
+    )
+    
+    if (authority) {
+      program.authority = true
+    }
+    else {
+      program.authority = false
+    }
+
     if (!program.typescript && !program.javascript) {
       if (ciInfo.isCI) {
         // default to JavaScript in CI as we can't prompt to
@@ -281,31 +334,6 @@ async function run(): Promise<void> {
         program.javascript = !Boolean(typescript)
         preferences.typescript = Boolean(typescript)
       }
-    }
-
-    const { template } = await prompts(
-      {
-        type: 'toggle',
-        name: 'template',
-        message: `Would you like to use processcube template?`,
-        initial: getPrefOrDefault('template'),
-        active: 'Yes',
-        inactive: 'No',
-      },
-      {
-        /**
-         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
-         * process and not write to the file system.
-         */
-        onCancel: () => {
-          console.error('Exiting.')
-          process.exit(1)
-        },
-      }
-    )
-    
-    if (template) {
-      example = 'https://github.com/MarcRaeder/PoC-Next.js-Template/tree/develop/my-app2'
     }
 
     if (
@@ -398,37 +426,8 @@ async function run(): Promise<void> {
     ) {
       if (ciInfo.isCI) {
         program.importAlias = '@/*'
-      } else {
-        const styledImportAlias = chalk.hex('#007acc')('import alias')
-
-        const { customizeImportAlias } = await prompts({
-          onState: onPromptState,
-          type: 'toggle',
-          name: 'customizeImportAlias',
-          message: `Would you like to customize the default ${styledImportAlias}?`,
-          initial: getPrefOrDefault('customizeImportAlias'),
-          active: 'Yes',
-          inactive: 'No',
-        })
-
-        if (!customizeImportAlias) {
-          program.importAlias = '@/*'
-        } else {
-          const { importAlias } = await prompts({
-            onState: onPromptState,
-            type: 'text',
-            name: 'importAlias',
-            message: `What ${styledImportAlias} would you like configured?`,
-            initial: getPrefOrDefault('importAlias'),
-            validate: (value) =>
-              /.+\/\*/.test(value)
-                ? true
-                : 'Import alias must follow the pattern <prefix>/*',
-          })
-          program.importAlias = importAlias
-          preferences.importAlias = importAlias
-        }
-      }
+      } 
+      program.importAlias = '@/*'
     }
   }
 
@@ -444,6 +443,7 @@ async function run(): Promise<void> {
       appRouter: program.app,
       srcDir: program.srcDir,
       importAlias: program.importAlias,
+      authority: program.authority,
     })
   } catch (reason) {
     if (!(reason instanceof DownloadError)) {
@@ -472,6 +472,7 @@ async function run(): Promise<void> {
       appRouter: program.app,
       srcDir: program.srcDir,
       importAlias: program.importAlias,
+      authority: program.authority,
     })
   }
   conf.set('preferences', preferences)
