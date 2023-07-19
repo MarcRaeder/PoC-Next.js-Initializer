@@ -46,6 +46,7 @@ export const installTemplate = async ({
    */
   console.log('\nInitializing project with template:', template, '\n');
   const templatePath = path.join(__dirname, template, mode);
+  console.log('temolatepath', templatePath)
   const copySource = ['**'];
   if (!eslint) copySource.push('!eslintrc.json');
   if (!tailwind) copySource.push('!tailwind.config.js', '!postcss.config.js');
@@ -100,13 +101,8 @@ export const installTemplate = async ({
     );
   }
 
-  if (authority) {
-    await makeDir(path.join(root, 'api/auth/[...nextauth]'));
-    const dockerComposeFile = path.join(root, 'docker-compose.yml');
-    await fs.promises.writeFile('docker-compose.yml', await fs.promises.readFile('docker-compose.yml'));
-    const middlewareFile = path.join(root, 'middleware.tsx');
-    const routeFile = path.join(root, 'route.ts');
-  }
+
+  const isAppTemplate = template.startsWith('app');
 
   if (srcDir) {
     await makeDir(path.join(root, 'src'));
@@ -120,7 +116,6 @@ export const installTemplate = async ({
       })
     );
 
-    const isAppTemplate = template.startsWith('app');
 
     // Change the `Get started by editing pages/index` / `app/page` to include `src`
     const indexPageFile = path.join(
@@ -145,6 +140,28 @@ export const installTemplate = async ({
         ).replace(/\.\/(\w+)\/\*\*\/\*\.\{js,ts,jsx,tsx,mdx\}/g, './src/$1/**/*.{js,ts,jsx,tsx,mdx}')
       );
     }
+
+  }
+
+  if (authority) {
+    /**
+     * the path depends on whether the user wants a src and/or app directory
+     */
+    const destinationPathSegments = [root];
+    if (srcDir) {
+      destinationPathSegments.push('src');
+    }
+
+    if (isAppTemplate) {
+      destinationPathSegments.push('app');
+    }
+
+    const nextAuthPath = path.join(...destinationPathSegments, 'api', 'auth', '[...nextauth]')
+    const dockerComposeFilePath = path.join(root, 'docker-compose.yml');
+    await makeDir(nextAuthPath);
+    await fs.promises.writeFile(dockerComposeFilePath, await fs.promises.readFile(path.join(__dirname, 'authority', 'docker-compose.yml')));
+    const middlewareFile = path.join(root, 'middleware.tsx');
+    const routeFile = path.join(root, 'route.ts');
   }
 
   /**
