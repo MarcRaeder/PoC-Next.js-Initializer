@@ -46,7 +46,7 @@ export const installTemplate = async ({
    */
   console.log('\nInitializing project with template:', template, '\n');
   const templatePath = path.join(__dirname, template, mode);
-  console.log('temolatepath', templatePath)
+  console.log('temolatepath', templatePath);
   const copySource = ['**'];
   if (!eslint) copySource.push('!eslintrc.json');
   if (!tailwind) copySource.push('!tailwind.config.js', '!postcss.config.js');
@@ -101,7 +101,6 @@ export const installTemplate = async ({
     );
   }
 
-
   const isAppTemplate = template.startsWith('app');
 
   if (srcDir) {
@@ -115,7 +114,6 @@ export const installTemplate = async ({
         });
       })
     );
-
 
     // Change the `Get started by editing pages/index` / `app/page` to include `src`
     const indexPageFile = path.join(
@@ -140,7 +138,6 @@ export const installTemplate = async ({
         ).replace(/\.\/(\w+)\/\*\*\/\*\.\{js,ts,jsx,tsx,mdx\}/g, './src/$1/**/*.{js,ts,jsx,tsx,mdx}')
       );
     }
-
   }
 
   if (authority) {
@@ -156,11 +153,18 @@ export const installTemplate = async ({
       destinationPathSegments.push('app');
     }
 
-    const nextAuthPath = path.join(...destinationPathSegments, 'api', 'auth', '[...nextauth]')
+    const nextAuthPath = path.join(...destinationPathSegments, 'api', 'auth', '[...nextauth]');
     const dockerComposeFilePath = path.join(root, 'docker-compose.yml');
     await makeDir(nextAuthPath);
-    await fs.promises.writeFile(dockerComposeFilePath, await fs.promises.readFile(path.join(__dirname, 'authority', 'docker-compose.yml')));
-    const middlewareFile = path.join(root, 'middleware.tsx');
+    await fs.promises.writeFile(
+      dockerComposeFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', 'docker-compose.yml'))
+    );
+    const middlewareFilePath = path.join(root, 'middleware.tsx');
+    await fs.promises.writeFile(
+      middlewareFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', 'middleware.tsx'))
+    );
     const routeFile = path.join(root, 'route.ts');
   }
 
