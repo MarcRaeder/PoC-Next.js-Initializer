@@ -170,6 +170,18 @@ export const installTemplate = async ({
       routeFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', 'route.ts'))
     );
+    const processcubePath = path.join(root, '.processcube');
+    await makeDir(processcubePath);
+    const configFilePath = path.join(processcubePath, 'config.json');
+    await fs.promises.writeFile(
+      configFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', 'config.json'))
+    );
+    const usersFilePath = path.join(processcubePath, 'users.json');
+    await fs.promises.writeFile(
+      usersFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', 'users.json'))
+    );
   }
 
   /**
