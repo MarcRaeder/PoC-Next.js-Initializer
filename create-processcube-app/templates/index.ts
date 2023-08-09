@@ -165,7 +165,11 @@ export const installTemplate = async ({
       middlewareFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', 'middleware.tsx'))
     );
-    const routeFile = path.join(root, 'route.ts');
+    const routeFilePath = path.join(nextAuthPath, 'route.ts');
+    await fs.promises.writeFile(
+      routeFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', 'route.ts'))
+    );
   }
 
   /**
