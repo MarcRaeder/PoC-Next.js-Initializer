@@ -217,6 +217,10 @@ export const installTemplate = async ({
     dependencies.push('tailwindcss', 'postcss', 'autoprefixer');
   }
 
+  if (authority) {
+    dependencies.push('next-auth');
+  }
+
   /**
    * Default eslint dependencies.
    */
