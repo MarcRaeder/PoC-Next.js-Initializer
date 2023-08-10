@@ -165,6 +165,11 @@ export const installTemplate = async ({
       middlewareFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', 'middleware.tsx'))
     );
+    const envFilePath = path.join(root, '.env');
+    await fs.promises.writeFile(
+      envFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'authority', '.env'))
+    );
     const routeFilePath = path.join(nextAuthPath, 'route.ts');
     await fs.promises.writeFile(
       routeFilePath,
@@ -172,12 +177,14 @@ export const installTemplate = async ({
     );
     const processcubePath = path.join(root, '.processcube');
     await makeDir(processcubePath);
-    const configFilePath = path.join(processcubePath, 'config.json');
+    const authorityPath = path.join(processcubePath, 'authority');
+    await makeDir(authorityPath);
+    const configFilePath = path.join(authorityPath, 'config.json');
     await fs.promises.writeFile(
       configFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', 'config.json'))
     );
-    const usersFilePath = path.join(processcubePath, 'users.json');
+    const usersFilePath = path.join(authorityPath, 'users.json');
     await fs.promises.writeFile(
       usersFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', 'users.json'))
