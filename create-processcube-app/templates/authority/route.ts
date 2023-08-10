@@ -1,8 +1,13 @@
-import NextAuth from 'next-auth';
+import { authConfigJwtCallback, authConfigSessionCallback } from '@5minds/processcube_app_sdk';
 
-const handler = NextAuth({
-  debug: true,
+import NextAuth, { AuthOptions } from 'next-auth';
+
+const authOptions: AuthOptions = {
   session: { strategy: 'jwt' },
+  callbacks: {
+    jwt: authConfigJwtCallback,
+    session: authConfigSessionCallback,
+  },
   providers: [
     {
       id: 'authority',
@@ -11,7 +16,7 @@ const handler = NextAuth({
       wellKnown: 'http://authority:11560/.well-known/openid-configuration',
       authorization: {
         params: {
-          scope: 'openid email profile',
+          scope: 'openid email profile engine_read',
         },
       },
       idToken: true,
@@ -28,6 +33,8 @@ const handler = NextAuth({
       },
     },
   ],
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

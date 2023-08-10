@@ -1,7 +1,13 @@
 {
   "issuerUrl": "http://authority:11560",
   "applicationPort": 11560,
-  "development": true,
+  "development": {
+    "builtInReactDevServer": false,
+    "detailedErrors": true,
+    "disableHttpsEnforcement": true,
+    "enableLocalhostImplicit": true,
+    "fixWrongHostnames": true
+  },
   "studio": true,
   "engines": [
     {
@@ -13,7 +19,7 @@
     {
       "clientId": "newportal",
       "clientSecret": "newportal",
-      "scope": "openid profile email",
+      "scope": "openid profile email engine_read engine_write",
       "grant_types": ["authorization_code"],
       "response_types": ["code"],
       "redirect_uris": ["http://localhost:3000/api/auth/callback/authority"]
@@ -25,13 +31,14 @@
     "logging": false
   },
   "extensions": {
-    "path": "../extensions",
+    "path": "/app/extensions",
     "configs": {
       "username_password": {
         "usersPath": "/etc/authority/config/users.json",
-        "customization": {
-          "title": "5Minds Authority",
-          "logoPath": "/etc/authority/config/assets/5minds_logo.png"
+        "database": {
+          "dialect": "sqlite",
+          "storage": "storage/upe-database.sqlite",
+          "logging": true
         }
       }
     }

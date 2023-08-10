@@ -242,6 +242,7 @@ export const installTemplate = async ({
 
   if (authority) {
     dependencies.push('next-auth');
+    dependencies.push('@5minds/processcube_app_sdk@^0.0.1-develop-e5b363-lki8hmms');
   }
 
   /**
