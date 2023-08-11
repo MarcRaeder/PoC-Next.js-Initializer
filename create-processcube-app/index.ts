@@ -246,31 +246,6 @@ async function run(): Promise<void> {
     const getPrefOrDefault = (field: string) =>
       preferences[field] ?? defaults[field]
 
-    const { template } = await prompts(
-      {
-        type: 'toggle',
-        name: 'template',
-        message: `Would you like to use processcube template?`,
-        initial: getPrefOrDefault('template'),
-        active: 'Yes',
-        inactive: 'No',
-      },
-      {
-        /**
-         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
-         * process and not write to the file system.
-         */
-        onCancel: () => {
-          console.error('Exiting.')
-          process.exit(1)
-        },
-      }
-    )
-    
-    if (template) {
-      example = 'https://github.com/MarcRaeder/PoC-Next.js-Template/tree/develop/my-app2'
-    }
-
     const { authority } = await prompts(
       {
         type: 'toggle',
