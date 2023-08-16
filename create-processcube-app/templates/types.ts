@@ -22,4 +22,5 @@ export interface InstallTemplateArgs {
   srcDir: boolean;
   importAlias: string;
   authority: boolean;
+  engine: boolean;
 }

@@ -38,6 +38,7 @@ export const installTemplate = async ({
   srcDir,
   importAlias,
   authority,
+  engine,
 }: InstallTemplateArgs) => {
   console.log(chalk.bold(`Using ${packageManager}.`));
 
@@ -191,6 +192,53 @@ export const installTemplate = async ({
     );
   }
 
+  if (engine) {
+    /**
+     * the path depends on whether the user wants a src and/or app directory
+     */
+    const destinationPathSegments = [root];
+    if (srcDir) {
+      destinationPathSegments.push('src');
+    }
+
+    if (isAppTemplate) {
+      destinationPathSegments.push('app');
+    }
+
+    const dockerComposeFilePath = path.join(root, 'docker-compose.yml');
+
+    if(authority) {
+      await fs.readFile(path.join(__dirname, 'engine', 'docker-compose.yml'), 'utf8', async (err, data) => {
+        if (err) {
+          console.error('Error reading the file:', err);
+          return;
+        }
+      
+        const lines = data.split('\n').slice(2);
+        const modifiedContent = lines.join('\n');
+        await fs.promises.appendFile(dockerComposeFilePath, modifiedContent);
+      });
+    } else {
+      await fs.promises.writeFile(
+        dockerComposeFilePath,
+        await fs.promises.readFile(path.join(__dirname, 'engine', 'docker-compose.yml'))
+      );
+    }
+    const envFilePath = path.join(root, '.env');
+    await fs.promises.writeFile(
+      envFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'engine', '.env'))
+    );
+    const processcubePath = path.join(root, '.processcube');
+    await makeDir(processcubePath);
+    const enginePath = path.join(processcubePath, 'engine/config');
+    await makeDir(enginePath);
+    const configFilePath = path.join(enginePath, 'config.json');
+    await fs.promises.writeFile(
+      configFilePath,
+      await fs.promises.readFile(path.join(__dirname, 'engine', 'config.json'))
+    );
+  }
   /**
    * Create a package.json for the new project.
    */
@@ -224,6 +272,7 @@ export const installTemplate = async ({
     'react',
     'react-dom',
     `next${process.env.NEXT_PRIVATE_TEST_VERSION ? `@${process.env.NEXT_PRIVATE_TEST_VERSION}` : ''}`,
+    '@5minds/processcube_app_sdk@^0.0.1-develop-e5b363-lki8hmms',
   ];
 
   /**
@@ -242,7 +291,6 @@ export const installTemplate = async ({
 
   if (authority) {
     dependencies.push('next-auth');
-    dependencies.push('@5minds/processcube_app_sdk@^0.0.1-develop-e5b363-lki8hmms');
   }
 
   /**

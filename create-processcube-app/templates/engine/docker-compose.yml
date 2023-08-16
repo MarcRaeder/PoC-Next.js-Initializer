@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  engine:
+    image: 5minds/engine:15.0.0-extensions-latest
+    ports:
+      - 8000:8000
+    volumes:
+      - ./.processcube/engine/config:/etc/engine/config:ro
+      - ./processes:/processes:ro
+    environment:
+      CONFIG_PATH: /etc/engine/config/config.json
+    command: --seed-dir=/processes

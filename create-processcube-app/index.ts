@@ -274,6 +274,34 @@ async function run(): Promise<void> {
       program.authority = false
     }
 
+    const { engine } = await prompts(
+      {
+        type: 'toggle',
+        name: 'engine',
+        message: `Would you like to use processcube engine?`,
+        initial: getPrefOrDefault('engine'),
+        active: 'Yes',
+        inactive: 'No',
+      },
+      {
+        /**
+         * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
+         * process and not write to the file system.
+         */
+        onCancel: () => {
+          console.error('Exiting.')
+          process.exit(1)
+        },
+      }
+    )
+
+    if (engine) {
+      program.engine = true
+    }
+    else {
+      program.engine = false
+    }
+
     if (!program.typescript && !program.javascript) {
       if (ciInfo.isCI) {
         // default to JavaScript in CI as we can't prompt to
@@ -419,6 +447,7 @@ async function run(): Promise<void> {
       srcDir: program.srcDir,
       importAlias: program.importAlias,
       authority: program.authority,
+      engine: program.engine,
     })
   } catch (reason) {
     if (!(reason instanceof DownloadError)) {
@@ -448,6 +477,7 @@ async function run(): Promise<void> {
       srcDir: program.srcDir,
       importAlias: program.importAlias,
       authority: program.authority,
+      engine: program.engine,
     })
   }
   conf.set('preferences', preferences)
