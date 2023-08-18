@@ -14,7 +14,7 @@
     "host": null,
     "port": null,
     "dialect": "sqlite",
-    "storage": "atlasengine.sqlite",
+    "storage": "engine.sqlite",
     "supportBigNumbers": true,
     "resetPasswordRequestTimeToLive": 12,
     "logging": false

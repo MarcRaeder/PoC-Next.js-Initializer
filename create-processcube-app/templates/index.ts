@@ -167,7 +167,7 @@ export const installTemplate = async ({
       await fs.promises.readFile(path.join(__dirname, 'authority', 'middleware.tsx'))
     );
     const envFilePath = path.join(root, '.env');
-    await fs.promises.writeFile(
+    await fs.promises.appendFile(
       envFilePath,
       await fs.promises.readFile(path.join(__dirname, 'authority', '.env'))
     );
@@ -181,10 +181,22 @@ export const installTemplate = async ({
     const authorityPath = path.join(processcubePath, 'authority');
     await makeDir(authorityPath);
     const configFilePath = path.join(authorityPath, 'config.json');
+
+    if (!engine) {
+    const configFile = await fs.promises.readFile(path.join(__dirname, 'authority', 'config.json'), 'utf-8');
+    const configObject = JSON.parse(configFile);
+    delete configObject.engines;
+    const newConfigFile = JSON.stringify(configObject, null, 2);
     await fs.promises.writeFile(
       configFilePath,
-      await fs.promises.readFile(path.join(__dirname, 'authority', 'config.json'))
+      newConfigFile
     );
+    } else {
+      await fs.promises.writeFile(
+        configFilePath,
+        await fs.promises.readFile(path.join(__dirname, 'authority', 'config.json'), 'utf-8')
+      );
+    }
     const usersFilePath = path.join(authorityPath, 'users.json');
     await fs.promises.writeFile(
       usersFilePath,
@@ -206,39 +218,46 @@ export const installTemplate = async ({
     }
 
     const dockerComposeFilePath = path.join(root, 'docker-compose.yml');
+    const processcubePath = path.join(root, '.processcube');
+    await makeDir(processcubePath);
+    const enginePath = path.join(processcubePath, 'engine/config');
+    await makeDir(enginePath);
+    const configFilePath = path.join(enginePath, 'config.json');
+    
 
     if(authority) {
       await fs.readFile(path.join(__dirname, 'engine', 'docker-compose.yml'), 'utf8', async (err, data) => {
         if (err) {
           console.error('Error reading the file:', err);
           return;
-        }
-      
+        }  
         const lines = data.split('\n').slice(2);
         const modifiedContent = lines.join('\n');
         await fs.promises.appendFile(dockerComposeFilePath, modifiedContent);
       });
+      await fs.promises.writeFile(
+        configFilePath,
+        await fs.promises.readFile(path.join(__dirname, 'engine', 'config.json'), 'utf-8')
+      );
     } else {
       await fs.promises.writeFile(
         dockerComposeFilePath,
         await fs.promises.readFile(path.join(__dirname, 'engine', 'docker-compose.yml'))
       );
-    }
+      const configFile = await fs.promises.readFile(path.join(__dirname, 'engine', 'config.json'), 'utf-8');
+      const configObject = JSON.parse(configFile);
+      delete configObject.iam;
+      const newConfigFile = JSON.stringify(configObject, null, 2);
+      await fs.promises.writeFile(
+        configFilePath,
+        newConfigFile)
+      ;}
     const envFilePath = path.join(root, '.env');
-    await fs.promises.writeFile(
+    await fs.promises.appendFile(
       envFilePath,
       await fs.promises.readFile(path.join(__dirname, 'engine', '.env'))
     );
-    const processcubePath = path.join(root, '.processcube');
-    await makeDir(processcubePath);
-    const enginePath = path.join(processcubePath, 'engine/config');
-    await makeDir(enginePath);
-    const configFilePath = path.join(enginePath, 'config.json');
-    await fs.promises.writeFile(
-      configFilePath,
-      await fs.promises.readFile(path.join(__dirname, 'engine', 'config.json'))
-    );
-  }
+    }
   /**
    * Create a package.json for the new project.
    */
